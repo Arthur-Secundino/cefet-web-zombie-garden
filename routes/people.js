@@ -26,12 +26,28 @@ router.get('/', async (req, res, next) => {
     //   - por exemplo, assim que uma pessoa é excluída, uma mensagem de
     //     sucesso pode ser mostrada
     // - error: idem para mensagem de erro
-    res.render('list-people', {
-      people,
-      success: req.flash('success'),
-      error: req.flash('error')
-    })
+    res.format({
+      html: () => {
+        if(people.length < 1){
+          req.flash("error", "Não foi possível buscar as pessoas");
+          res.redirect("/");
+          return;
+        }
 
+        res.render('list-people', {
+          people,
+          success: req.flash('success'),
+          error: req.flash('error')
+        })
+      },
+      json: () => {
+        if(people.length < 1){
+          res.status(404).send({});
+        }
+
+        res.json({people});
+      }
+    });
   } catch (error) {
     console.error(error)
     error.friendlyMessage = 'Problema ao recuperar pessoas'
