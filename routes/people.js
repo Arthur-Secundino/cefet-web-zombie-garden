@@ -97,19 +97,20 @@ router.post("/", async (req, res, next) => {
 
     if(result.length < 1){
       req.flash("error", "Pessoa não pôde ser registrada");
-      res.redirect("/");
-      return
+      res.redirect("/people/");
+      return;
     }
 
     req.flash("success", "Pessoa adicionada com sucesso");
-    res.redirect("/");
+    res.redirect("/people/");
   }
   catch(error){
     console.error(error);
-    EvalError.friendlyMessage = "Erro desconhecido ao tentar registrar uma nova pessoa";
+    error.friendlyMessage = "Erro desconhecido ao tentar registrar uma nova pessoa";
     next(error);
   }
 });
+
 
 /* DELETE uma pessoa */
 // Exercício 2: IMPLEMENTAR AQUI
@@ -118,6 +119,27 @@ router.post("/", async (req, res, next) => {
 //   2. Redirecionar para a rota de listagem de pessoas
 //      - Em caso de sucesso do INSERT, colocar uma mensagem feliz
 //      - Em caso de erro do INSERT, colocar mensagem vermelhinha
+router.delete("/:id", async(req, res, next) => {
+  try{
+    const [result] = await db.execute({
+      sql: "DELETE FROM person WHERE id=?",
+      values: [req.params.id]
+    });
 
+    if(result.length < 1){
+      req.flash("error", "Pessoa não pôde ser excluída");
+      res.redirect("/people/");
+      return;
+    }
+
+    req.flash("success", "Pessoa excluída com sucesso");
+    res.redirect("/people/");
+  }
+  catch(error){
+    console.error(error);
+    error.friendlyMessage = "Erro desconhecido ao tentar excluir uma pessoa";
+    next(error);
+  }
+});
 
 export default router
